@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Name="CapSense" WorkspaceName="CapSense.cywrk">
+  <Version>1.0</Version>
+  <Keyword>PWM</Keyword>
+  <Keyword>CapSense</Keyword>
+  <Keyword>EZI2C</Keyword>
+  <Keyword Hidden="true">CY8CKIT-042</Keyword>
+  <Description>This code example demonstrates the CapSense functionality as well as CapSense tuning using the Tuner Helper GUI in PSoC Creator.</Description>
+  <DeviceFilter>PSoC 4200</DeviceFilter>
+  <MinToolVersion>4.2</MinToolVersion>
+</Project>

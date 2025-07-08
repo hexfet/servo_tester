@@ -1,0 +1,771 @@
+ARM GAS  C:\Users\jon\AppData\Local\Temp\cc1G4ABg.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m0
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 0
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"main.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.global	lastPosition
+  20              		.data
+  21              		.align	1
+  22              		.type	lastPosition, %object
+  23              		.size	lastPosition, 2
+  24              	lastPosition:
+  25 0000 FFFF     		.short	-1
+  26              		.section	.text.main,"ax",%progbits
+  27              		.align	2
+  28              		.global	main
+  29              		.code	16
+  30              		.thumb_func
+  31              		.type	main, %function
+  32              	main:
+  33              	.LFB32:
+  34              		.file 1 "main.c"
+   1:main.c        **** /******************************************************************************
+   2:main.c        **** * Project Name		: CapSense
+   3:main.c        **** * File Name			: main.c
+   4:main.c        **** * Version 			: 1.0
+   5:main.c        **** * Device Used		: CY8C4245AXI-483
+   6:main.c        **** * Software Used		: PSoC Creator 4.2
+   7:main.c        **** * Compiler    		: ARM GCC 5.4.1
+   8:main.c        **** * Related Hardware	: CY8CKIT-042 PSoC 4 Pioneer Kit
+   9:main.c        **** *
+  10:main.c        **** *******************************************************************************
+  11:main.c        **** * Copyright (2019), Cypress Semiconductor Corporation. All rights reserved.
+  12:main.c        **** *******************************************************************************
+  13:main.c        **** * This software, including source code, documentation and related materials
+  14:main.c        **** * (“Software”), is owned by Cypress Semiconductor Corporation or one of its
+  15:main.c        **** * subsidiaries (“Cypress”) and is protected by and subject to worldwide patent
+  16:main.c        **** * protection (United States and foreign), United States copyright laws and
+  17:main.c        **** * international treaty provisions. Therefore, you may use this Software only
+  18:main.c        **** * as provided in the license agreement accompanying the software package from
+  19:main.c        **** * which you obtained this Software (“EULA”).
+  20:main.c        **** *
+  21:main.c        **** * If no EULA applies, Cypress hereby grants you a personal, nonexclusive,
+  22:main.c        **** * non-transferable license to copy, modify, and compile the Software source
+  23:main.c        **** * code solely for use in connection with Cypress’s integrated circuit products.
+ARM GAS  C:\Users\jon\AppData\Local\Temp\cc1G4ABg.s 			page 2
+
+
+  24:main.c        **** * Any reproduction, modification, translation, compilation, or representation
+  25:main.c        **** * of this Software except as specified above is prohibited without the express
+  26:main.c        **** * written permission of Cypress.
+  27:main.c        **** *
+  28:main.c        **** * Disclaimer: THIS SOFTWARE IS PROVIDED AS-IS, WITH NO WARRANTY OF ANY KIND,
+  29:main.c        **** * EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, NONINFRINGEMENT, IMPLIED
+  30:main.c        **** * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. Cypress
+  31:main.c        **** * reserves the right to make changes to the Software without notice. Cypress
+  32:main.c        **** * does not assume any liability arising out of the application or use of the
+  33:main.c        **** * Software or any product or circuit described in the Software. Cypress does
+  34:main.c        **** * not authorize its products for use in any products where a malfunction or
+  35:main.c        **** * failure of the Cypress product may reasonably be expected to result in
+  36:main.c        **** * significant property damage, injury or death (“High Risk Product”). By
+  37:main.c        **** * including Cypress’s product in a High Risk Product, the manufacturer of such
+  38:main.c        **** * system or application assumes all risk of such use and in doing so agrees to
+  39:main.c        **** * indemnify Cypress against all liability.
+  40:main.c        **** *******************************************************************************/
+  41:main.c        **** 
+  42:main.c        **** /******************************************************************************
+  43:main.c        **** *                           THEORY OF OPERATION
+  44:main.c        **** * This project demonstrates the CapSense application using on board 5 segment
+  45:main.c        **** * CapSense slider. The multicolor LED on the CY8CKIT-042 changes color from red
+  46:main.c        **** * to green as you move the finger along the slider.
+  47:main.c        **** *
+  48:main.c        **** * Hardware connection on the Kit
+  49:main.c        **** * Slider	 - P1[1:5]
+  50:main.c        **** * LED_Green	 - P0[2]
+  51:main.c        **** * LED_Red 	 - P1[6]
+  52:main.c        **** ******************************************************************************/
+  53:main.c        **** #include <project.h>
+  54:main.c        **** 
+  55:main.c        **** 
+  56:main.c        **** /* Define constant for CapSense slider */
+  57:main.c        **** #define NO_FINGER 0xFFFFu
+  58:main.c        **** 
+  59:main.c        **** /* Uncomment the following line to enable the tuner. Disabling the tuner allows
+  60:main.c        ****  * the project to operate in a stand-alone fashion without connecting
+  61:main.c        ****  * the I2C tuning interface */
+  62:main.c        **** //#define ENABLE_TUNER
+  63:main.c        **** 
+  64:main.c        **** 
+  65:main.c        **** uint16 lastPosition = NO_FINGER;
+  66:main.c        **** 
+  67:main.c        **** void UpdateRGB(void);
+  68:main.c        **** 
+  69:main.c        **** int main()
+  70:main.c        **** {
+  35              		.loc 1 70 0
+  36              		.cfi_startproc
+  37              		@ args = 0, pretend = 0, frame = 0
+  38              		@ frame_needed = 1, uses_anonymous_args = 0
+  39 0000 80B5     		push	{r7, lr}
+  40              		.cfi_def_cfa_offset 8
+  41              		.cfi_offset 7, -8
+  42              		.cfi_offset 14, -4
+  43 0002 00AF     		add	r7, sp, #0
+  44              		.cfi_def_cfa_register 7
+ARM GAS  C:\Users\jon\AppData\Local\Temp\cc1G4ABg.s 			page 3
+
+
+  71:main.c        **** 	/* Enable Global Interrupts */
+  72:main.c        **** 	CyGlobalIntEnable;
+  45              		.loc 1 72 0
+  46              		.syntax divided
+  47              	@ 72 "main.c" 1
+  48 0004 62B6     		CPSIE   i
+  49              	@ 0 "" 2
+  73:main.c        **** 
+  74:main.c        **** 	/* Start all the components */
+  75:main.c        **** 	Clock_Start();
+  50              		.loc 1 75 0
+  51              		.thumb
+  52              		.syntax unified
+  53 0006 FFF7FEFF 		bl	Clock_Start
+  76:main.c        **** 	PWM_Start();
+  54              		.loc 1 76 0
+  55 000a FFF7FEFF 		bl	PWM_Start
+  77:main.c        ****     RC_OUT_Start();
+  56              		.loc 1 77 0
+  57 000e FFF7FEFF 		bl	RC_OUT_Start
+  78:main.c        **** 
+  79:main.c        **** 	#ifdef ENABLE_TUNER
+  80:main.c        **** 		CapSense_TunerStart();
+  81:main.c        **** 	#else
+  82:main.c        **** 		CapSense_Start();
+  58              		.loc 1 82 0
+  59 0012 FFF7FEFF 		bl	CapSense_Start
+  83:main.c        **** 
+  84:main.c        **** 	/* Initialize CapSense baselines by scanning enabled sensors */
+  85:main.c        **** 	    CapSense_InitializeAllBaselines();
+  60              		.loc 1 85 0
+  61 0016 FFF7FEFF 		bl	CapSense_InitializeAllBaselines
+  62              	.L4:
+  86:main.c        **** 	#endif
+  87:main.c        ****     
+  88:main.c        **** 	for(;;)
+  89:main.c        **** 	{
+  90:main.c        **** 		#ifdef ENABLE_TUNER
+  91:main.c        **** 			CapSense_TunerComm();
+  92:main.c        **** 			UpdateRGB();
+  93:main.c        **** 		#else
+  94:main.c        **** 			/* Update all baselines */
+  95:main.c        **** 			CapSense_UpdateEnabledBaselines();
+  63              		.loc 1 95 0
+  64 001a FFF7FEFF 		bl	CapSense_UpdateEnabledBaselines
+  96:main.c        **** 
+  97:main.c        **** 			/* Start scanning all enabled sensors */
+  98:main.c        **** 	    	CapSense_ScanEnabledWidgets();
+  65              		.loc 1 98 0
+  66 001e FFF7FEFF 		bl	CapSense_ScanEnabledWidgets
+  99:main.c        **** 
+ 100:main.c        **** 			/* Wait for scanning to complete */
+ 101:main.c        **** 			while(CapSense_IsBusy()!= 0)
+  67              		.loc 1 101 0
+  68 0022 01E0     		b	.L2
+  69              	.L3:
+ 102:main.c        ****         	{
+ARM GAS  C:\Users\jon\AppData\Local\Temp\cc1G4ABg.s 			page 4
+
+
+ 103:main.c        **** 				UpdateRGB();
+  70              		.loc 1 103 0
+  71 0024 FFF7FEFF 		bl	UpdateRGB
+  72              	.L2:
+ 101:main.c        ****         	{
+  73              		.loc 1 101 0
+  74 0028 FFF7FEFF 		bl	CapSense_IsBusy
+  75 002c 031E     		subs	r3, r0, #0
+  76 002e F9D1     		bne	.L3
+ 104:main.c        **** 			}
+ 105:main.c        **** 
+ 106:main.c        **** 		#endif
+ 107:main.c        **** 	}
+  77              		.loc 1 107 0
+  78 0030 F3E7     		b	.L4
+  79              		.cfi_endproc
+  80              	.LFE32:
+  81              		.size	main, .-main
+  82              		.global	__aeabi_uidiv
+  83 0032 C046     		.section	.text.UpdateRGB,"ax",%progbits
+  84              		.align	2
+  85              		.global	UpdateRGB
+  86              		.code	16
+  87              		.thumb_func
+  88              		.type	UpdateRGB, %function
+  89              	UpdateRGB:
+  90              	.LFB33:
+ 108:main.c        **** }
+ 109:main.c        **** void UpdateRGB(void)
+ 110:main.c        **** {
+  91              		.loc 1 110 0
+  92              		.cfi_startproc
+  93              		@ args = 0, pretend = 0, frame = 8
+  94              		@ frame_needed = 1, uses_anonymous_args = 0
+  95 0000 90B5     		push	{r4, r7, lr}
+  96              		.cfi_def_cfa_offset 12
+  97              		.cfi_offset 4, -12
+  98              		.cfi_offset 7, -8
+  99              		.cfi_offset 14, -4
+ 100 0002 83B0     		sub	sp, sp, #12
+ 101              		.cfi_def_cfa_offset 24
+ 102 0004 00AF     		add	r7, sp, #0
+ 103              		.cfi_def_cfa_register 7
+ 111:main.c        **** 	/* Find Slider Position */
+ 112:main.c        **** 	uint16 sliderPosition = CapSense_GetCentroidPos(CapSense_LINEARSLIDER0__LS);
+ 104              		.loc 1 112 0
+ 105 0006 BC1D     		adds	r4, r7, #6
+ 106 0008 0020     		movs	r0, #0
+ 107 000a FFF7FEFF 		bl	CapSense_GetCentroidPos
+ 108 000e 0300     		movs	r3, r0
+ 109 0010 2380     		strh	r3, [r4]
+ 113:main.c        **** 
+ 114:main.c        **** 	/*If finger is detected on the slider*/
+ 115:main.c        **** 	if(sliderPosition != NO_FINGER)
+ 110              		.loc 1 115 0
+ 111 0012 BB1D     		adds	r3, r7, #6
+ 112 0014 1B88     		ldrh	r3, [r3]
+ARM GAS  C:\Users\jon\AppData\Local\Temp\cc1G4ABg.s 			page 5
+
+
+ 113 0016 184A     		ldr	r2, .L8
+ 114 0018 9342     		cmp	r3, r2
+ 115 001a 29D0     		beq	.L7
+ 116:main.c        **** 	{
+ 117:main.c        **** 		/* If finger position on the slider is changed then update the LED color */
+ 118:main.c        ****     	if(sliderPosition != lastPosition)
+ 116              		.loc 1 118 0
+ 117 001c 174B     		ldr	r3, .L8+4
+ 118 001e 1B88     		ldrh	r3, [r3]
+ 119 0020 BA1D     		adds	r2, r7, #6
+ 120 0022 1288     		ldrh	r2, [r2]
+ 121 0024 9A42     		cmp	r2, r3
+ 122 0026 23D0     		beq	.L7
+ 123              	.LBB2:
+ 119:main.c        ****     	{
+ 120:main.c        **** 			/* Update the PWM pulse width with the new slider position */
+ 121:main.c        ****         	PWM_WriteCompare(sliderPosition);
+ 124              		.loc 1 121 0
+ 125 0028 BB1D     		adds	r3, r7, #6
+ 126 002a 1B88     		ldrh	r3, [r3]
+ 127 002c 1800     		movs	r0, r3
+ 128 002e FFF7FEFF 		bl	PWM_WriteCompare
+ 122:main.c        ****             uint16 rc_pwm = (1000 + ((uint32)sliderPosition * 1000) / 255) / 10; 
+ 129              		.loc 1 122 0
+ 130 0032 BB1D     		adds	r3, r7, #6
+ 131 0034 1B88     		ldrh	r3, [r3]
+ 132 0036 FA22     		movs	r2, #250
+ 133 0038 9200     		lsls	r2, r2, #2
+ 134 003a 5343     		muls	r3, r2
+ 135 003c FF21     		movs	r1, #255
+ 136 003e 1800     		movs	r0, r3
+ 137 0040 FFF7FEFF 		bl	__aeabi_uidiv
+ 138 0044 0300     		movs	r3, r0
+ 139 0046 FA22     		movs	r2, #250
+ 140 0048 9200     		lsls	r2, r2, #2
+ 141 004a 9446     		mov	ip, r2
+ 142 004c 6344     		add	r3, r3, ip
+ 143 004e 0A21     		movs	r1, #10
+ 144 0050 1800     		movs	r0, r3
+ 145 0052 FFF7FEFF 		bl	__aeabi_uidiv
+ 146 0056 0300     		movs	r3, r0
+ 147 0058 1A00     		movs	r2, r3
+ 148 005a 3B1D     		adds	r3, r7, #4
+ 149 005c 1A80     		strh	r2, [r3]
+ 123:main.c        ****             RC_OUT_WriteCompare(rc_pwm);
+ 150              		.loc 1 123 0
+ 151 005e 3B1D     		adds	r3, r7, #4
+ 152 0060 1B88     		ldrh	r3, [r3]
+ 153 0062 1800     		movs	r0, r3
+ 154 0064 FFF7FEFF 		bl	RC_OUT_WriteCompare
+ 124:main.c        **** 			lastPosition = sliderPosition;
+ 155              		.loc 1 124 0
+ 156 0068 044B     		ldr	r3, .L8+4
+ 157 006a BA1D     		adds	r2, r7, #6
+ 158 006c 1288     		ldrh	r2, [r2]
+ 159 006e 1A80     		strh	r2, [r3]
+ 160              	.L7:
+ARM GAS  C:\Users\jon\AppData\Local\Temp\cc1G4ABg.s 			page 6
+
+
+ 161              	.LBE2:
+ 125:main.c        **** 		}
+ 126:main.c        **** 	}
+ 127:main.c        **** }
+ 162              		.loc 1 127 0
+ 163 0070 C046     		nop
+ 164 0072 BD46     		mov	sp, r7
+ 165 0074 03B0     		add	sp, sp, #12
+ 166              		@ sp needed
+ 167 0076 90BD     		pop	{r4, r7, pc}
+ 168              	.L9:
+ 169              		.align	2
+ 170              	.L8:
+ 171 0078 FFFF0000 		.word	65535
+ 172 007c 00000000 		.word	lastPosition
+ 173              		.cfi_endproc
+ 174              	.LFE33:
+ 175              		.size	UpdateRGB, .-UpdateRGB
+ 176              		.text
+ 177              	.Letext0:
+ 178              		.file 2 "Generated_Source\\PSoC4/cytypes.h"
+ 179              		.section	.debug_info,"",%progbits
+ 180              	.Ldebug_info0:
+ 181 0000 05010000 		.4byte	0x105
+ 182 0004 0400     		.2byte	0x4
+ 183 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 184 000a 04       		.byte	0x4
+ 185 000b 01       		.uleb128 0x1
+ 186 000c 1F010000 		.4byte	.LASF18
+ 187 0010 0C       		.byte	0xc
+ 188 0011 22000000 		.4byte	.LASF19
+ 189 0015 83000000 		.4byte	.LASF20
+ 190 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 191 001d 00000000 		.4byte	0
+ 192 0021 00000000 		.4byte	.Ldebug_line0
+ 193 0025 02       		.uleb128 0x2
+ 194 0026 01       		.byte	0x1
+ 195 0027 06       		.byte	0x6
+ 196 0028 2E000000 		.4byte	.LASF0
+ 197 002c 02       		.uleb128 0x2
+ 198 002d 01       		.byte	0x1
+ 199 002e 08       		.byte	0x8
+ 200 002f C6000000 		.4byte	.LASF1
+ 201 0033 02       		.uleb128 0x2
+ 202 0034 02       		.byte	0x2
+ 203 0035 05       		.byte	0x5
+ 204 0036 15010000 		.4byte	.LASF2
+ 205 003a 02       		.uleb128 0x2
+ 206 003b 02       		.byte	0x2
+ 207 003c 07       		.byte	0x7
+ 208 003d E9000000 		.4byte	.LASF3
+ 209 0041 02       		.uleb128 0x2
+ 210 0042 04       		.byte	0x4
+ 211 0043 05       		.byte	0x5
+ 212 0044 D9000000 		.4byte	.LASF4
+ 213 0048 02       		.uleb128 0x2
+ 214 0049 04       		.byte	0x4
+ARM GAS  C:\Users\jon\AppData\Local\Temp\cc1G4ABg.s 			page 7
+
+
+ 215 004a 07       		.byte	0x7
+ 216 004b 50000000 		.4byte	.LASF5
+ 217 004f 02       		.uleb128 0x2
+ 218 0050 08       		.byte	0x8
+ 219 0051 05       		.byte	0x5
+ 220 0052 00000000 		.4byte	.LASF6
+ 221 0056 02       		.uleb128 0x2
+ 222 0057 08       		.byte	0x8
+ 223 0058 07       		.byte	0x7
+ 224 0059 62000000 		.4byte	.LASF7
+ 225 005d 03       		.uleb128 0x3
+ 226 005e 04       		.byte	0x4
+ 227 005f 05       		.byte	0x5
+ 228 0060 696E7400 		.ascii	"int\000"
+ 229 0064 02       		.uleb128 0x2
+ 230 0065 04       		.byte	0x4
+ 231 0066 07       		.byte	0x7
+ 232 0067 15000000 		.4byte	.LASF8
+ 233 006b 04       		.uleb128 0x4
+ 234 006c FC000000 		.4byte	.LASF9
+ 235 0070 02       		.byte	0x2
+ 236 0071 FD01     		.2byte	0x1fd
+ 237 0073 3A000000 		.4byte	0x3a
+ 238 0077 04       		.uleb128 0x4
+ 239 0078 0E000000 		.4byte	.LASF10
+ 240 007c 02       		.byte	0x2
+ 241 007d FE01     		.2byte	0x1fe
+ 242 007f 48000000 		.4byte	0x48
+ 243 0083 02       		.uleb128 0x2
+ 244 0084 04       		.byte	0x4
+ 245 0085 04       		.byte	0x4
+ 246 0086 0F010000 		.4byte	.LASF11
+ 247 008a 02       		.uleb128 0x2
+ 248 008b 08       		.byte	0x8
+ 249 008c 04       		.byte	0x4
+ 250 008d E2000000 		.4byte	.LASF12
+ 251 0091 02       		.uleb128 0x2
+ 252 0092 01       		.byte	0x1
+ 253 0093 08       		.byte	0x8
+ 254 0094 D4000000 		.4byte	.LASF13
+ 255 0098 02       		.uleb128 0x2
+ 256 0099 04       		.byte	0x4
+ 257 009a 07       		.byte	0x7
+ 258 009b BA010000 		.4byte	.LASF14
+ 259 009f 02       		.uleb128 0x2
+ 260 00a0 08       		.byte	0x8
+ 261 00a1 04       		.byte	0x4
+ 262 00a2 03010000 		.4byte	.LASF15
+ 263 00a6 05       		.uleb128 0x5
+ 264 00a7 29000000 		.4byte	.LASF21
+ 265 00ab 01       		.byte	0x1
+ 266 00ac 45       		.byte	0x45
+ 267 00ad 5D000000 		.4byte	0x5d
+ 268 00b1 00000000 		.4byte	.LFB32
+ 269 00b5 32000000 		.4byte	.LFE32-.LFB32
+ 270 00b9 01       		.uleb128 0x1
+ 271 00ba 9C       		.byte	0x9c
+ARM GAS  C:\Users\jon\AppData\Local\Temp\cc1G4ABg.s 			page 8
+
+
+ 272 00bb 06       		.uleb128 0x6
+ 273 00bc 79000000 		.4byte	.LASF22
+ 274 00c0 01       		.byte	0x1
+ 275 00c1 6D       		.byte	0x6d
+ 276 00c2 00000000 		.4byte	.LFB33
+ 277 00c6 80000000 		.4byte	.LFE33-.LFB33
+ 278 00ca 01       		.uleb128 0x1
+ 279 00cb 9C       		.byte	0x9c
+ 280 00cc F7000000 		.4byte	0xf7
+ 281 00d0 07       		.uleb128 0x7
+ 282 00d1 3A000000 		.4byte	.LASF16
+ 283 00d5 01       		.byte	0x1
+ 284 00d6 70       		.byte	0x70
+ 285 00d7 6B000000 		.4byte	0x6b
+ 286 00db 02       		.uleb128 0x2
+ 287 00dc 91       		.byte	0x91
+ 288 00dd 6E       		.sleb128 -18
+ 289 00de 08       		.uleb128 0x8
+ 290 00df 28000000 		.4byte	.LBB2
+ 291 00e3 48000000 		.4byte	.LBE2-.LBB2
+ 292 00e7 07       		.uleb128 0x7
+ 293 00e8 49000000 		.4byte	.LASF17
+ 294 00ec 01       		.byte	0x1
+ 295 00ed 7A       		.byte	0x7a
+ 296 00ee 6B000000 		.4byte	0x6b
+ 297 00f2 02       		.uleb128 0x2
+ 298 00f3 91       		.byte	0x91
+ 299 00f4 6C       		.sleb128 -20
+ 300 00f5 00       		.byte	0
+ 301 00f6 00       		.byte	0
+ 302 00f7 09       		.uleb128 0x9
+ 303 00f8 AD010000 		.4byte	.LASF23
+ 304 00fc 01       		.byte	0x1
+ 305 00fd 41       		.byte	0x41
+ 306 00fe 6B000000 		.4byte	0x6b
+ 307 0102 05       		.uleb128 0x5
+ 308 0103 03       		.byte	0x3
+ 309 0104 00000000 		.4byte	lastPosition
+ 310 0108 00       		.byte	0
+ 311              		.section	.debug_abbrev,"",%progbits
+ 312              	.Ldebug_abbrev0:
+ 313 0000 01       		.uleb128 0x1
+ 314 0001 11       		.uleb128 0x11
+ 315 0002 01       		.byte	0x1
+ 316 0003 25       		.uleb128 0x25
+ 317 0004 0E       		.uleb128 0xe
+ 318 0005 13       		.uleb128 0x13
+ 319 0006 0B       		.uleb128 0xb
+ 320 0007 03       		.uleb128 0x3
+ 321 0008 0E       		.uleb128 0xe
+ 322 0009 1B       		.uleb128 0x1b
+ 323 000a 0E       		.uleb128 0xe
+ 324 000b 55       		.uleb128 0x55
+ 325 000c 17       		.uleb128 0x17
+ 326 000d 11       		.uleb128 0x11
+ 327 000e 01       		.uleb128 0x1
+ 328 000f 10       		.uleb128 0x10
+ARM GAS  C:\Users\jon\AppData\Local\Temp\cc1G4ABg.s 			page 9
+
+
+ 329 0010 17       		.uleb128 0x17
+ 330 0011 00       		.byte	0
+ 331 0012 00       		.byte	0
+ 332 0013 02       		.uleb128 0x2
+ 333 0014 24       		.uleb128 0x24
+ 334 0015 00       		.byte	0
+ 335 0016 0B       		.uleb128 0xb
+ 336 0017 0B       		.uleb128 0xb
+ 337 0018 3E       		.uleb128 0x3e
+ 338 0019 0B       		.uleb128 0xb
+ 339 001a 03       		.uleb128 0x3
+ 340 001b 0E       		.uleb128 0xe
+ 341 001c 00       		.byte	0
+ 342 001d 00       		.byte	0
+ 343 001e 03       		.uleb128 0x3
+ 344 001f 24       		.uleb128 0x24
+ 345 0020 00       		.byte	0
+ 346 0021 0B       		.uleb128 0xb
+ 347 0022 0B       		.uleb128 0xb
+ 348 0023 3E       		.uleb128 0x3e
+ 349 0024 0B       		.uleb128 0xb
+ 350 0025 03       		.uleb128 0x3
+ 351 0026 08       		.uleb128 0x8
+ 352 0027 00       		.byte	0
+ 353 0028 00       		.byte	0
+ 354 0029 04       		.uleb128 0x4
+ 355 002a 16       		.uleb128 0x16
+ 356 002b 00       		.byte	0
+ 357 002c 03       		.uleb128 0x3
+ 358 002d 0E       		.uleb128 0xe
+ 359 002e 3A       		.uleb128 0x3a
+ 360 002f 0B       		.uleb128 0xb
+ 361 0030 3B       		.uleb128 0x3b
+ 362 0031 05       		.uleb128 0x5
+ 363 0032 49       		.uleb128 0x49
+ 364 0033 13       		.uleb128 0x13
+ 365 0034 00       		.byte	0
+ 366 0035 00       		.byte	0
+ 367 0036 05       		.uleb128 0x5
+ 368 0037 2E       		.uleb128 0x2e
+ 369 0038 00       		.byte	0
+ 370 0039 3F       		.uleb128 0x3f
+ 371 003a 19       		.uleb128 0x19
+ 372 003b 03       		.uleb128 0x3
+ 373 003c 0E       		.uleb128 0xe
+ 374 003d 3A       		.uleb128 0x3a
+ 375 003e 0B       		.uleb128 0xb
+ 376 003f 3B       		.uleb128 0x3b
+ 377 0040 0B       		.uleb128 0xb
+ 378 0041 49       		.uleb128 0x49
+ 379 0042 13       		.uleb128 0x13
+ 380 0043 11       		.uleb128 0x11
+ 381 0044 01       		.uleb128 0x1
+ 382 0045 12       		.uleb128 0x12
+ 383 0046 06       		.uleb128 0x6
+ 384 0047 40       		.uleb128 0x40
+ 385 0048 18       		.uleb128 0x18
+ARM GAS  C:\Users\jon\AppData\Local\Temp\cc1G4ABg.s 			page 10
+
+
+ 386 0049 9642     		.uleb128 0x2116
+ 387 004b 19       		.uleb128 0x19
+ 388 004c 00       		.byte	0
+ 389 004d 00       		.byte	0
+ 390 004e 06       		.uleb128 0x6
+ 391 004f 2E       		.uleb128 0x2e
+ 392 0050 01       		.byte	0x1
+ 393 0051 3F       		.uleb128 0x3f
+ 394 0052 19       		.uleb128 0x19
+ 395 0053 03       		.uleb128 0x3
+ 396 0054 0E       		.uleb128 0xe
+ 397 0055 3A       		.uleb128 0x3a
+ 398 0056 0B       		.uleb128 0xb
+ 399 0057 3B       		.uleb128 0x3b
+ 400 0058 0B       		.uleb128 0xb
+ 401 0059 27       		.uleb128 0x27
+ 402 005a 19       		.uleb128 0x19
+ 403 005b 11       		.uleb128 0x11
+ 404 005c 01       		.uleb128 0x1
+ 405 005d 12       		.uleb128 0x12
+ 406 005e 06       		.uleb128 0x6
+ 407 005f 40       		.uleb128 0x40
+ 408 0060 18       		.uleb128 0x18
+ 409 0061 9642     		.uleb128 0x2116
+ 410 0063 19       		.uleb128 0x19
+ 411 0064 01       		.uleb128 0x1
+ 412 0065 13       		.uleb128 0x13
+ 413 0066 00       		.byte	0
+ 414 0067 00       		.byte	0
+ 415 0068 07       		.uleb128 0x7
+ 416 0069 34       		.uleb128 0x34
+ 417 006a 00       		.byte	0
+ 418 006b 03       		.uleb128 0x3
+ 419 006c 0E       		.uleb128 0xe
+ 420 006d 3A       		.uleb128 0x3a
+ 421 006e 0B       		.uleb128 0xb
+ 422 006f 3B       		.uleb128 0x3b
+ 423 0070 0B       		.uleb128 0xb
+ 424 0071 49       		.uleb128 0x49
+ 425 0072 13       		.uleb128 0x13
+ 426 0073 02       		.uleb128 0x2
+ 427 0074 18       		.uleb128 0x18
+ 428 0075 00       		.byte	0
+ 429 0076 00       		.byte	0
+ 430 0077 08       		.uleb128 0x8
+ 431 0078 0B       		.uleb128 0xb
+ 432 0079 01       		.byte	0x1
+ 433 007a 11       		.uleb128 0x11
+ 434 007b 01       		.uleb128 0x1
+ 435 007c 12       		.uleb128 0x12
+ 436 007d 06       		.uleb128 0x6
+ 437 007e 00       		.byte	0
+ 438 007f 00       		.byte	0
+ 439 0080 09       		.uleb128 0x9
+ 440 0081 34       		.uleb128 0x34
+ 441 0082 00       		.byte	0
+ 442 0083 03       		.uleb128 0x3
+ARM GAS  C:\Users\jon\AppData\Local\Temp\cc1G4ABg.s 			page 11
+
+
+ 443 0084 0E       		.uleb128 0xe
+ 444 0085 3A       		.uleb128 0x3a
+ 445 0086 0B       		.uleb128 0xb
+ 446 0087 3B       		.uleb128 0x3b
+ 447 0088 0B       		.uleb128 0xb
+ 448 0089 49       		.uleb128 0x49
+ 449 008a 13       		.uleb128 0x13
+ 450 008b 3F       		.uleb128 0x3f
+ 451 008c 19       		.uleb128 0x19
+ 452 008d 02       		.uleb128 0x2
+ 453 008e 18       		.uleb128 0x18
+ 454 008f 00       		.byte	0
+ 455 0090 00       		.byte	0
+ 456 0091 00       		.byte	0
+ 457              		.section	.debug_aranges,"",%progbits
+ 458 0000 24000000 		.4byte	0x24
+ 459 0004 0200     		.2byte	0x2
+ 460 0006 00000000 		.4byte	.Ldebug_info0
+ 461 000a 04       		.byte	0x4
+ 462 000b 00       		.byte	0
+ 463 000c 0000     		.2byte	0
+ 464 000e 0000     		.2byte	0
+ 465 0010 00000000 		.4byte	.LFB32
+ 466 0014 32000000 		.4byte	.LFE32-.LFB32
+ 467 0018 00000000 		.4byte	.LFB33
+ 468 001c 80000000 		.4byte	.LFE33-.LFB33
+ 469 0020 00000000 		.4byte	0
+ 470 0024 00000000 		.4byte	0
+ 471              		.section	.debug_ranges,"",%progbits
+ 472              	.Ldebug_ranges0:
+ 473 0000 00000000 		.4byte	.LFB32
+ 474 0004 32000000 		.4byte	.LFE32
+ 475 0008 00000000 		.4byte	.LFB33
+ 476 000c 80000000 		.4byte	.LFE33
+ 477 0010 00000000 		.4byte	0
+ 478 0014 00000000 		.4byte	0
+ 479              		.section	.debug_line,"",%progbits
+ 480              	.Ldebug_line0:
+ 481 0000 7E000000 		.section	.debug_str,"MS",%progbits,1
+ 481      02004100 
+ 481      00000201 
+ 481      FB0E0D00 
+ 481      01010101 
+ 482              	.LASF6:
+ 483 0000 6C6F6E67 		.ascii	"long long int\000"
+ 483      206C6F6E 
+ 483      6720696E 
+ 483      7400
+ 484              	.LASF10:
+ 485 000e 75696E74 		.ascii	"uint32\000"
+ 485      333200
+ 486              	.LASF8:
+ 487 0015 756E7369 		.ascii	"unsigned int\000"
+ 487      676E6564 
+ 487      20696E74 
+ 487      00
+ 488              	.LASF19:
+ARM GAS  C:\Users\jon\AppData\Local\Temp\cc1G4ABg.s 			page 12
+
+
+ 489 0022 6D61696E 		.ascii	"main.c\000"
+ 489      2E6300
+ 490              	.LASF21:
+ 491 0029 6D61696E 		.ascii	"main\000"
+ 491      00
+ 492              	.LASF0:
+ 493 002e 7369676E 		.ascii	"signed char\000"
+ 493      65642063 
+ 493      68617200 
+ 494              	.LASF16:
+ 495 003a 736C6964 		.ascii	"sliderPosition\000"
+ 495      6572506F 
+ 495      73697469 
+ 495      6F6E00
+ 496              	.LASF17:
+ 497 0049 72635F70 		.ascii	"rc_pwm\000"
+ 497      776D00
+ 498              	.LASF5:
+ 499 0050 6C6F6E67 		.ascii	"long unsigned int\000"
+ 499      20756E73 
+ 499      69676E65 
+ 499      6420696E 
+ 499      7400
+ 500              	.LASF7:
+ 501 0062 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 501      206C6F6E 
+ 501      6720756E 
+ 501      7369676E 
+ 501      65642069 
+ 502              	.LASF22:
+ 503 0079 55706461 		.ascii	"UpdateRGB\000"
+ 503      74655247 
+ 503      4200
+ 504              	.LASF20:
+ 505 0083 433A5C55 		.ascii	"C:\\Users\\jon\\Documents\\PSoC Creator\\servo_test"
+ 505      73657273 
+ 505      5C6A6F6E 
+ 505      5C446F63 
+ 505      756D656E 
+ 506 00b1 65725C53 		.ascii	"er\\ServoTester.cydsn\000"
+ 506      6572766F 
+ 506      54657374 
+ 506      65722E63 
+ 506      7964736E 
+ 507              	.LASF1:
+ 508 00c6 756E7369 		.ascii	"unsigned char\000"
+ 508      676E6564 
+ 508      20636861 
+ 508      7200
+ 509              	.LASF13:
+ 510 00d4 63686172 		.ascii	"char\000"
+ 510      00
+ 511              	.LASF4:
+ 512 00d9 6C6F6E67 		.ascii	"long int\000"
+ 512      20696E74 
+ 512      00
+ 513              	.LASF12:
+ARM GAS  C:\Users\jon\AppData\Local\Temp\cc1G4ABg.s 			page 13
+
+
+ 514 00e2 646F7562 		.ascii	"double\000"
+ 514      6C6500
+ 515              	.LASF3:
+ 516 00e9 73686F72 		.ascii	"short unsigned int\000"
+ 516      7420756E 
+ 516      7369676E 
+ 516      65642069 
+ 516      6E7400
+ 517              	.LASF9:
+ 518 00fc 75696E74 		.ascii	"uint16\000"
+ 518      313600
+ 519              	.LASF15:
+ 520 0103 6C6F6E67 		.ascii	"long double\000"
+ 520      20646F75 
+ 520      626C6500 
+ 521              	.LASF11:
+ 522 010f 666C6F61 		.ascii	"float\000"
+ 522      7400
+ 523              	.LASF2:
+ 524 0115 73686F72 		.ascii	"short int\000"
+ 524      7420696E 
+ 524      7400
+ 525              	.LASF18:
+ 526 011f 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 526      43313120 
+ 526      352E342E 
+ 526      31203230 
+ 526      31363036 
+ 527 0152 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m0 -mthumb -g -O"
+ 527      20726576 
+ 527      6973696F 
+ 527      6E203233 
+ 527      37373135 
+ 528 0185 30202D66 		.ascii	"0 -ffunction-sections -ffat-lto-objects\000"
+ 528      66756E63 
+ 528      74696F6E 
+ 528      2D736563 
+ 528      74696F6E 
+ 529              	.LASF23:
+ 530 01ad 6C617374 		.ascii	"lastPosition\000"
+ 530      506F7369 
+ 530      74696F6E 
+ 530      00
+ 531              	.LASF14:
+ 532 01ba 73697A65 		.ascii	"sizetype\000"
+ 532      74797065 
+ 532      00
+ 533              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran
